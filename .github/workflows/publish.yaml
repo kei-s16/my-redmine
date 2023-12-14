@@ -25,6 +25,9 @@ jobs:
       uses: docker/metadata-action@v5
       with:
         images: ghcr.io/kei-s16/my-redmine
+        tags: |
+          type=sha
+          type=edge, branch=main
     - name: "コンテナイメージをビルドしてghcr.ioにコンテナイメージをpushする"
       uses: docker/build-push-action@v5
       with:
