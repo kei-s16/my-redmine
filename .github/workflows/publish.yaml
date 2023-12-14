@@ -1,0 +1,23 @@
+name: 'ghcr.ioへのイメージpush'
+
+on:
+  push:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    steps:
+    - name: "checkoutする"
+      uses: actions/checkout@v4
+    - name: "docker buildxが使えるようにする"
+      uses: docker/setup-buildx-action@v3
+    - name: "コンテナイメージをビルドする"
+      run: |
+        docker buildx build . --file ./docker/redmine/Dockerfile --tag ghcr.io/kei-s16/my-redmine:latest --target runner
+        docker tag ghcr.io/kei-s16/my-redmine:latest ghcr.io/kei-s16/my-redmine:${{ github.sha }}
+    - name: "ghcr.ioにログインする"
+      run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u USERNAME --password-stdin
+    - name: "ghcr.ioにコンテナイメージをpushする"
+      run: docker push ghcr.io/kei-s16/my-redmine:latest
