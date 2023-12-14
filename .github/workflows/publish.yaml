@@ -8,16 +8,27 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       packages: write
+      contents: read
     steps:
     - name: "checkoutする"
       uses: actions/checkout@v4
     - name: "docker buildxが使えるようにする"
       uses: docker/setup-buildx-action@v3
     - name: "ghcr.ioにログインする"
-      run: echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u USERNAME --password-stdin
-    - name: "コンテナイメージをビルドする"
-      run: |
-        docker buildx build . --file ./docker/redmine/Dockerfile --tag ghcr.io/kei-s16/my-redmine:latest --target runner
-        docker tag ghcr.io/kei-s16/my-redmine:latest ghcr.io/kei-s16/my-redmine:${{ github.sha }}
-    - name: "ghcr.ioにコンテナイメージをpushする"
-      run: docker push ghcr.io/kei-s16/my-redmine:latest
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: "メタデータを作成する"
+      id: meta
+      uses: docker/metadata-action@v5
+      with:
+        images: ghcr.io/my-redmine
+    - name: "コンテナイメージをビルドしてghcr.ioにコンテナイメージをpushする"
+      uses: docker/build-push-action@v5
+      with:
+        file: ./docker/redmine/Dockerfile
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
