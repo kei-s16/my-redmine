@@ -1,0 +1,21 @@
+services:
+  redmine:
+    build:
+      context: .
+      dockerfile: ./docker/redmine/Dockerfile
+      target: runner
+    restart: always
+    ports:
+      - 8080:3000
+    environment:
+      REDMINE_DB_MYSQL: mariadb
+      REDMINE_DB_PASSWORD:
+      REDMINE_SECRET_KEY_BASE:
+
+  mariadb:
+    image: mariadb:11.2.2
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD:
+      MARIADB_DATABASE: "redmine"
+      TZ: "Asia/Tokyo"
