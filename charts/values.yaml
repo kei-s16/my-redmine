@@ -5,10 +5,10 @@
 replicaCount: 1
 
 image:
-  repository: redmine
+  repository: ghcr.io/kei-s16/my-redmine
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "5.0.5"
+  tag: "latest"
 
 imagePullSecrets: []
 nameOverride: ""
